@@ -19,6 +19,12 @@ export default function Home() {
         >
           Open dashboard
         </Link>
+        <Link
+          href="/demo"
+          className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-surface-raised"
+        >
+          Try demo
+        </Link>
       </div>
       <p className="mt-6 text-xs text-muted">
         Currently live on Stellar testnet. Not audited - do not use with

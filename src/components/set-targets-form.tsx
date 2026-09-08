@@ -4,18 +4,11 @@ import { useState } from "react";
 import { useWallet } from "@/hooks/use-wallet";
 import { useAllocation, useSetTargets } from "@/hooks/use-vault";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
+import { pctToBps } from "@/lib/format";
 import type { TargetWeight } from "@/contracts/vault";
 
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
 const EMPTY_WEIGHTS: Record<AssetSymbol, string> = { XLM: "", USDC: "" };
-
-/** "60" -> 6000. Rounds rather than truncates so "33.335" reads as the
- * bps a human typing a percentage would expect. */
-function pctToBps(pct: string): number | null {
-  const n = Number(pct);
-  if (!Number.isFinite(n)) return null;
-  return Math.round(n * 100);
-}
 
 export function SetTargetsForm() {
   const { address } = useWallet();

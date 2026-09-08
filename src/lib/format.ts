@@ -25,3 +25,12 @@ export function formatSignedBps(bps: number): string {
   const sign = bps > 0 ? "+" : "";
   return `${sign}${formatBps(bps)}`;
 }
+
+/** "60" -> 6000. Rounds rather than truncates so "33.335" reads as the
+ * bps a human typing a percentage would expect. Returns null for
+ * anything that doesn't parse as a plain number (empty string, "abc"). */
+export function pctToBps(pct: string): number | null {
+  const n = Number(pct);
+  if (!Number.isFinite(n) || pct.trim() === "") return null;
+  return Math.round(n * 100);
+}
