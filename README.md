@@ -47,3 +47,12 @@ hydration mismatch caused by Stellar Wallets Kit writing its own CSS vars
 onto `<html>` on init - fixed with `suppressHydrationWarning` on that
 element, the standard escape hatch for a third-party script mutating it
 before hydration).
+
+`vault` was later redeployed (Phase 2, to attach `risk_guard` - see
+`../contracts/README.md`) and `src/contracts/vault.ts` regenerated
+against the new address accordingly. `tsc --noEmit` and `eslint` both
+pass clean against the regenerated bindings, but the browser
+verification above predates that redeploy and hasn't been repeated
+against it - environment constraints in the session that did the
+redeploy meant `next dev` wasn't reachable to re-screenshot. Worth an
+actual browser pass before calling this re-verified.
