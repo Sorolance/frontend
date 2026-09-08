@@ -5,6 +5,7 @@ import { ConnectWalletButton } from "@/components/connect-wallet-button";
 import { AllocationChart } from "@/components/allocation-chart";
 import { RebalanceStatus } from "@/components/rebalance-status";
 import { DepositWithdrawForm } from "@/components/deposit-withdraw-form";
+import { SetTargetsForm } from "@/components/set-targets-form";
 
 export default function DashboardPage() {
   return (
@@ -35,6 +36,13 @@ export default function DashboardPage() {
           Deposit / withdraw
         </h2>
         <DepositWithdrawForm />
+      </section>
+
+      <section className="mt-6">
+        <h2 className="mb-3 text-sm font-medium text-muted">
+          Target allocation
+        </h2>
+        <SetTargetsForm />
       </section>
     </div>
   );

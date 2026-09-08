@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getVaultClient } from "@/lib/stellar/contracts";
-import type { AllocationEntry } from "@/contracts/vault";
+import type { AllocationEntry, TargetWeight } from "@/contracts/vault";
 
 const VAULT_QUERY_KEY = ["vault"] as const;
 
@@ -45,6 +45,36 @@ export function useDeposit() {
     }) => {
       const client = getVaultClient({ publicKey: address });
       const tx = await client.deposit({ from: address, asset, amount });
+      const sent = await tx.signAndSend();
+      return sent.result.unwrap();
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: VAULT_QUERY_KEY });
+    },
+  });
+}
+
+/** Owner-only on-chain (`vault::set_targets` calls `owner.require_auth()`)
+ * - same as withdraw, this form doesn't hide itself from non-owner
+ *   wallets, it just surfaces whatever error the contract/wallet gives
+ *   back on submit. */
+export function useSetTargets() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      address,
+      targets,
+      thresholdBps,
+    }: {
+      address: string;
+      targets: TargetWeight[];
+      thresholdBps: number;
+    }) => {
+      const client = getVaultClient({ publicKey: address });
+      const tx = await client.set_targets({
+        targets,
+        threshold_bps: thresholdBps,
+      });
       const sent = await tx.signAndSend();
       return sent.result.unwrap();
     },
