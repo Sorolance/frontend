@@ -1,35 +1,39 @@
+"use client";
+
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useLocale } from "@/lib/i18n/context";
 
 export default function Home() {
+  const { t } = useLocale();
+
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="mb-3 text-sm font-medium text-muted">Stellar · Soroban</p>
-      <h1 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
-        Automated portfolio rebalancing, on-chain
-      </h1>
-      <p className="mt-5 max-w-xl text-lg text-muted">
-        Set a target allocation and a drift threshold. Your Soroban vault holds
-        the funds - never a custodian, never this app - and rebalances only
-        when it drifts past the threshold you set.
-      </p>
-      <div className="mt-8 flex gap-3">
-        <Link
-          href="/app"
-          className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background"
-        >
-          Open dashboard
-        </Link>
-        <Link
-          href="/demo"
-          className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-surface-raised"
-        >
-          Try demo
-        </Link>
+    <div className="flex flex-1 flex-col px-6">
+      <div className="flex justify-end pt-6">
+        <LanguageSwitcher />
       </div>
-      <p className="mt-6 text-xs text-muted">
-        Currently live on Stellar testnet. Not audited - do not use with
-        mainnet funds.
-      </p>
+      <div className="flex flex-1 flex-col items-center justify-center py-16 text-center">
+        <p className="mb-3 text-sm font-medium text-muted">{t.home.kicker}</p>
+        <h1 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+          {t.home.title}
+        </h1>
+        <p className="mt-5 max-w-xl text-lg text-muted">{t.home.description}</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/app"
+            className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background"
+          >
+            {t.nav.openDashboard}
+          </Link>
+          <Link
+            href="/demo"
+            className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-surface-raised"
+          >
+            {t.nav.tryDemo}
+          </Link>
+        </div>
+        <p className="mt-6 text-xs text-muted">{t.home.testnetNotice}</p>
+      </div>
     </div>
   );
 }

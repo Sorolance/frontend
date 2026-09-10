@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
+import { useLocale } from "@/lib/i18n/context";
 
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
 
@@ -20,6 +21,7 @@ export function DemoActions({
 }) {
   const [asset, setAsset] = useState<AssetSymbol>("XLM");
   const [amount, setAmount] = useState("");
+  const { t } = useLocale();
 
   function run(action: "deposit" | "withdraw") {
     const n = Number(amount);
@@ -45,36 +47,36 @@ export function DemoActions({
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             inputMode="decimal"
-            placeholder={`Amount in ${asset}`}
+            placeholder={t.common.amountIn(asset)}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm"
+            className="w-full min-w-0 rounded-md border border-border bg-transparent px-3 py-2 text-sm"
           />
-          <button
-            type="button"
-            onClick={() => run("deposit")}
-            className="shrink-0 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background"
-          >
-            Deposit
-          </button>
-          <button
-            type="button"
-            onClick={() => run("withdraw")}
-            className="shrink-0 rounded-md border border-border px-3 py-2 text-sm font-medium"
-          >
-            Withdraw
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => run("deposit")}
+              className="flex-1 shrink-0 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background sm:flex-none"
+            >
+              {t.common.deposit}
+            </button>
+            <button
+              type="button"
+              onClick={() => run("withdraw")}
+              className="flex-1 shrink-0 rounded-md border border-border px-3 py-2 text-sm font-medium sm:flex-none"
+            >
+              {t.common.withdraw}
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="border-t border-border pt-4">
-        <p className="mb-2 text-xs text-muted">
-          Simulate a price move to create drift, then watch the status above change.
-        </p>
+        <p className="mb-2 text-xs text-muted">{t.demoActions.shockHelp}</p>
         <div className="flex flex-wrap gap-2">
           {SYMBOLS.flatMap((symbol) =>
             [-20, 20].map((pct) => (
@@ -98,14 +100,14 @@ export function DemoActions({
           onClick={onRebalance}
           className="flex-1 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background"
         >
-          Rebalance now
+          {t.demoActions.rebalanceNow}
         </button>
         <button
           type="button"
           onClick={onReset}
           className="flex-1 rounded-md border border-border px-3 py-2 text-sm font-medium"
         >
-          Reset demo
+          {t.demoActions.resetDemo}
         </button>
       </div>
     </div>

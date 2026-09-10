@@ -30,6 +30,13 @@ See [`../PROJECT.md`](../PROJECT.md) for the full project plan.
   allocation/drift/deposit/withdraw/set-targets components as `/app`,
   pointed at that portfolio's own vault address, plus a CSV audit-log
   download.
+- **i18n** — every page's UI text is available in English, Spanish,
+  Portuguese, French, and German via a language switcher in each page's
+  header. Client-side only (no `/[lang]` route segments or `proxy.ts` -
+  see [Internationalization](#internationalization) below for why).
+- **Mobile-responsive** — every page works at phone width (~400px): no
+  horizontal scroll, header rows wrap instead of overflowing, and the
+  allocation chart's legend/label column adapt at the `sm` breakpoint.
 
 ## Architecture
 
@@ -39,6 +46,45 @@ See [`../PROJECT.md`](../PROJECT.md) for the full project plan.
 | `src/lib/stellar/` | Network config, contract client factories (`getVaultClient` takes an optional vault address override), and the Stellar Wallets Kit wrapper. |
 | `src/lib/api/` | Thin `fetch` wrapper around `rebalancer-api` (`listPortfolios`, `getPortfolio`, `createPortfolio`, `reportCsvUrl`) — only used by `/app/portfolios`. Base URL from `NEXT_PUBLIC_API_URL` (see `.env.example`), defaults to `http://localhost:8080`. |
 | `src/hooks/` | `useWallet`; TanStack Query hooks over the generated contract clients (`useAllocation`, `useNeedsRebalance`, `useDeposit`, `useWithdraw`, `useSetTargets` — each takes an optional `vaultAddress`, defaulting to the legacy hardcoded vault); `use-portfolios.ts`'s `usePortfolios`/`usePortfolio`/`useCreatePortfolio` (deploy → initialize → set_keeper → register). |
+
+### Internationalization
+
+`src/lib/i18n/` — a `Dictionary` type inferred from `locales/en.ts` (the
+source of truth), with `locales/{es,pt,fr,de}.ts` each type-checked
+against it, so a missing or mistyped key in any locale fails
+`tsc --noEmit` rather than silently falling back to English at runtime.
+Interpolated strings are typed functions (`(asset: string) => string`),
+not `{token}` templates, for the same reason.
+
+`LocaleProvider` (`src/lib/i18n/context.tsx`) exposes the current locale
+via `useSyncExternalStore` against `localStorage` + `navigator.languages`
+as an external store, not `useState` + a detect-on-mount effect - the
+project's ESLint config enforces
+`react-hooks/set-state-in-effect`, and the preference genuinely lives
+outside React (in the browser), so reading it is a synchronization
+problem in the `useSyncExternalStore` sense, not local component state.
+This also gets SSR-safe hydration for free: the server (and the first
+client paint, for a matching hydration pass) always render `"en"`
+(`getServerSnapshot`), then React re-renders with the real detected
+locale immediately after - a brief, one-time flash to English for a
+non-English-preferring first-time visitor is the deliberate tradeoff of
+staying client-side rather than adding `/[lang]` route segments and a
+`proxy.ts` (see [Next's internationalization
+guide](https://nextjs.org/docs/app/guides/internationalization) for that
+alternative) - not worth it for a dashboard where nearly every page is
+already a Client Component.
+
+`useLocale()` returns `{ locale, setLocale, t }`; components read
+`t.section.key` (or call it, for interpolated entries) instead of
+hardcoding strings. `<LanguageSwitcher />` (in every page's header) is
+the only place `setLocale` is called from today. Numbers/percentages
+(`formatBps` et al. in `src/lib/format.ts`) stay in a fixed
+period-decimal format regardless of locale - a deliberate scope
+decision for a financial app where ambiguous separators are worse than
+an unlocalized number; `/demo`'s USD amounts are the one exception,
+formatted via `Intl.NumberFormat` (`toLocaleString(locale, ...)`) since
+currency symbol/grouping conventions differ meaningfully by locale and
+the app already had this well-isolated in one function.
 
 ### Regenerating contract bindings
 
@@ -96,4 +142,17 @@ against a running `rebalancer-api` instance — that needs a human with a
 funded testnet wallet and Postgres running.
 
 No backtest/simulate routes yet — those wait on backend work
-(`rebalancer-backtest` is still CLI-only).
+(`rebalancer-backtest` is still CLI-only; `rebalancer-api`'s
+`/portfolios/:id/simulate` exists but has no frontend UI yet either —
+see `../PROJECT.md`).
+
+i18n (English/Spanish/Portuguese/French/German) and a mobile-responsive
+pass are done — `npm run lint`, `tsc --noEmit`, and `npm run build` all
+pass, and every route was smoke-tested via a local dev server (all
+return 200, no server-side errors, SSR output contains the expected
+translated strings). **Not verified in an actual browser** — this
+session had no screenshot/browser-automation tool available, so the
+language switcher's client-side behavior and the responsive CSS changes
+were verified by code review and build/type-check only, not by looking
+at a rendered page. A human should click through the switcher and
+resize a real browser window before calling this fully done.

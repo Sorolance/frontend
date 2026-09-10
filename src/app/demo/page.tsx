@@ -6,18 +6,21 @@ import { useDemoPortfolio } from "@/hooks/use-demo";
 import { AllocationBars } from "@/components/allocation-bars";
 import { DemoActions } from "@/components/demo-actions";
 import { DemoTargetsForm } from "@/components/demo-targets-form";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { ASSETS } from "@/lib/stellar/config";
 import { formatBps } from "@/lib/format";
-
-function formatUsd(n: number): string {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
+import { useLocale } from "@/lib/i18n/context";
 
 export default function DemoPage() {
   const demo = useDemoPortfolio();
+  const { t, locale } = useLocale();
   // Bumped on reset so DemoTargetsForm remounts and re-reads its initial
   // values from the (now reset) targets, rather than showing stale input.
   const [generation, setGeneration] = useState(0);
+
+  function formatUsd(n: number): string {
+    return n.toLocaleString(locale, { style: "currency", currency: "USD" });
+  }
 
   const totalValue = demo.allocation.reduce((sum, entry) => {
     const symbolTotal =
@@ -28,32 +31,31 @@ export default function DemoPage() {
   const statusColor = demo.needsRebalance
     ? "var(--color-status-warning)"
     : "var(--color-status-good)";
-  const statusLabel = demo.needsRebalance
-    ? "Drift exceeds threshold - rebalance needed"
-    : "On target";
+  const statusLabel = demo.needsRebalance ? t.status.needsRebalance : t.status.onTarget;
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-      <header className="mb-8 flex items-center justify-between">
+      <header className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <Link href="/" className="text-sm font-medium text-muted">
-          ← Rebalancer
+          {t.nav.backToRebalancer}
         </Link>
-        <Link
-          href="/app"
-          className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-surface-raised"
-        >
-          Open live dashboard
-        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <Link
+            href="/app"
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-surface-raised"
+          >
+            {t.nav.openLiveDashboard}
+          </Link>
+        </div>
       </header>
 
       <div className="mb-6 rounded-lg border border-border bg-surface-raised p-3 text-sm text-muted">
-        Demo mode - a simulated ${(10_000).toLocaleString("en-US")} portfolio.
-        No wallet, no real funds, nothing here touches the deployed vault.
-        Deposit/withdraw and price moves are all local to this page.
+        {t.demo.banner(formatUsd(10_000))}
       </div>
 
-      <h1 className="text-2xl font-semibold">Portfolio</h1>
-      <p className="mt-1 text-sm text-muted">{formatUsd(totalValue)} total</p>
+      <h1 className="text-2xl font-semibold">{t.dashboard.title}</h1>
+      <p className="mt-1 text-sm text-muted">{t.demo.total(formatUsd(totalValue))}</p>
 
       <div className="mt-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm">
@@ -67,7 +69,7 @@ export default function DemoPage() {
       </div>
 
       <section className="mt-8 rounded-lg border border-border p-5">
-        <h2 className="mb-4 text-sm font-medium text-muted">Allocation</h2>
+        <h2 className="mb-4 text-sm font-medium text-muted">{t.common.allocation}</h2>
         <AllocationBars
           entries={demo.allocation.map((entry) => ({
             key: entry.symbol,
@@ -82,7 +84,7 @@ export default function DemoPage() {
             <div key={symbol}>
               <dt className="font-medium text-foreground">{symbol}</dt>
               <dd>
-                {demo.state.balances[symbol].toLocaleString("en-US", {
+                {demo.state.balances[symbol].toLocaleString(locale, {
                   maximumFractionDigits: 2,
                 })}{" "}
                 @ {formatUsd(demo.state.prices[symbol])} ={" "}
@@ -95,7 +97,7 @@ export default function DemoPage() {
 
       <section className="mt-6">
         <h2 className="mb-3 text-sm font-medium text-muted">
-          Deposit / withdraw / simulate
+          {t.demo.depositWithdrawSimulate}
         </h2>
         <DemoActions
           onDeposit={demo.deposit}
@@ -110,7 +112,7 @@ export default function DemoPage() {
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-3 text-sm font-medium text-muted">Target allocation</h2>
+        <h2 className="mb-3 text-sm font-medium text-muted">{t.common.targetAllocation}</h2>
         <DemoTargetsForm
           key={generation}
           targets={demo.state.targets}
@@ -120,7 +122,7 @@ export default function DemoPage() {
       </section>
 
       <p className="mt-6 text-center text-xs text-muted">
-        Current threshold: {formatBps(demo.state.thresholdBps)}
+        {t.demo.currentThreshold(formatBps(demo.state.thresholdBps))}
       </p>
     </div>
   );

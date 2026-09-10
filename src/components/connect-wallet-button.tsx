@@ -1,6 +1,7 @@
 "use client";
 
 import { useWallet } from "@/hooks/use-wallet";
+import { useLocale } from "@/lib/i18n/context";
 
 function truncateAddress(address: string): string {
   return `${address.slice(0, 4)}…${address.slice(-4)}`;
@@ -8,6 +9,7 @@ function truncateAddress(address: string): string {
 
 export function ConnectWalletButton() {
   const { address, connecting, connect, disconnect } = useWallet();
+  const { t } = useLocale();
 
   if (address) {
     return (
@@ -15,7 +17,7 @@ export function ConnectWalletButton() {
         type="button"
         onClick={() => void disconnect()}
         className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-surface-raised"
-        title="Disconnect wallet"
+        title={t.common.disconnectWallet}
       >
         {truncateAddress(address)}
       </button>
@@ -29,7 +31,7 @@ export function ConnectWalletButton() {
       disabled={connecting}
       className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity disabled:opacity-50"
     >
-      {connecting ? "Connecting…" : "Connect Wallet"}
+      {connecting ? t.common.connecting : t.common.connectWallet}
     </button>
   );
 }

@@ -5,11 +5,13 @@ import { useWallet } from "@/hooks/use-wallet";
 import { useDeposit, useWithdraw } from "@/hooks/use-vault";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
 import { toStroops } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/context";
 
 export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } = {}) {
   const { address } = useWallet();
   const deposit = useDeposit();
   const withdraw = useWithdraw();
+  const { t } = useLocale();
 
   const [asset, setAsset] = useState<AssetSymbol>("XLM");
   const [amount, setAmount] = useState("");
@@ -38,10 +40,14 @@ export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } 
           vaultAddress,
         });
       }
-      setFeedback(`${action === "deposit" ? "Deposited" : "Withdrew"} ${amount} ${asset}.`);
+      setFeedback(
+        action === "deposit"
+          ? t.depositWithdrawForm.deposited(amount, asset)
+          : t.depositWithdrawForm.withdrew(amount, asset),
+      );
       setAmount("");
     } catch (err) {
-      setFeedback(err instanceof Error ? err.message : "Transaction failed.");
+      setFeedback(err instanceof Error ? err.message : t.common.transactionFailed);
     }
   }
 
@@ -66,7 +72,7 @@ export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } 
       <input
         type="text"
         inputMode="decimal"
-        placeholder={`Amount in ${asset}`}
+        placeholder={t.common.amountIn(asset)}
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm"
@@ -78,7 +84,7 @@ export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } 
           onClick={() => void run("deposit")}
           className="flex-1 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:opacity-50"
         >
-          Deposit
+          {t.common.deposit}
         </button>
         <button
           type="button"
@@ -86,11 +92,11 @@ export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } 
           onClick={() => void run("withdraw")}
           className="flex-1 rounded-md border border-border px-3 py-2 text-sm font-medium disabled:opacity-50"
         >
-          Withdraw
+          {t.common.withdraw}
         </button>
       </div>
       {!address && (
-        <p className="text-xs text-muted">Connect a wallet to deposit or withdraw.</p>
+        <p className="text-xs text-muted">{t.depositWithdrawForm.connectToDepositWithdraw}</p>
       )}
       {feedback && <p className="text-xs text-muted">{feedback}</p>}
     </div>

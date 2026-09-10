@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
 import { pctToBps } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/context";
 
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
 
@@ -15,6 +16,7 @@ export function DemoTargetsForm({
   thresholdBps: number;
   onSubmit: (targets: Record<AssetSymbol, number>, thresholdBps: number) => void;
 }) {
+  const { t } = useLocale();
   const [weights, setWeights] = useState<Record<AssetSymbol, string>>(() =>
     SYMBOLS.reduce(
       (acc, symbol) => ({ ...acc, [symbol]: (targets[symbol] / 100).toString() }),
@@ -59,12 +61,12 @@ export function DemoTargetsForm({
         </div>
       ))}
       <p className={`text-xs ${totalBps === 10_000 ? "text-muted" : "text-status-warning"}`}>
-        Total: {(totalBps / 100).toFixed(2)}% (must equal 100.00%)
+        {t.common.totalMustEqual100((totalBps / 100).toFixed(2))}
       </p>
 
       <div className="flex items-center gap-3 border-t border-border pt-3">
         <label className="w-14 shrink-0 text-sm font-medium" htmlFor="demo-target-threshold">
-          Drift
+          {t.common.drift}
         </label>
         <input
           id="demo-target-threshold"
@@ -83,7 +85,7 @@ export function DemoTargetsForm({
         onClick={submit}
         className="w-full rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:opacity-50"
       >
-        Set targets
+        {t.common.setTargets}
       </button>
     </div>
   );

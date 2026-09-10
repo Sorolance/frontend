@@ -1,4 +1,5 @@
 import { formatBps, formatSignedBps } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/context";
 
 export interface AllocationBarEntry {
   key: string;
@@ -13,6 +14,7 @@ export interface AllocationBarEntry {
  * this the same shape so the visualization itself never has to know
  * which one it's looking at. */
 export function AllocationBars({ entries }: { entries: AllocationBarEntry[] }) {
+  const { t } = useLocale();
   const maxAbsDrift = Math.max(
     1_000,
     ...entries.map((entry) => Math.abs(entry.drift_bps)),
@@ -49,31 +51,33 @@ export function AllocationBars({ entries }: { entries: AllocationBarEntry[] }) {
                   />
                 )}
               </div>
-              <div className="w-36 shrink-0 text-right tabular-nums">
+              <div className="w-28 shrink-0 text-right tabular-nums sm:w-36">
                 <div className="text-sm font-medium">{entry.label}</div>
                 <div className="text-xs text-muted">
-                  {formatBps(entry.current_weight_bps)} vs{" "}
-                  {formatBps(entry.target_weight_bps)} target
+                  {t.allocationBars.vsTarget(
+                    formatBps(entry.current_weight_bps),
+                    formatBps(entry.target_weight_bps),
+                  )}
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted">
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs text-muted">
         <span className="flex items-center gap-1.5">
           <span
-            className="inline-block h-2 w-2 rounded-full"
+            className="inline-block h-2 w-2 shrink-0 rounded-full"
             style={{ backgroundColor: "var(--color-divergent-under)" }}
           />
-          underweight (below target)
+          {t.allocationBars.underweight}
         </span>
         <span className="flex items-center gap-1.5">
           <span
-            className="inline-block h-2 w-2 rounded-full"
+            className="inline-block h-2 w-2 shrink-0 rounded-full"
             style={{ backgroundColor: "var(--color-divergent-over)" }}
           />
-          overweight (above target)
+          {t.allocationBars.overweight}
         </span>
       </div>
     </div>

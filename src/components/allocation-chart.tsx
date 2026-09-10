@@ -3,6 +3,7 @@
 import { useAllocation } from "@/hooks/use-vault";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
 import { AllocationBars } from "@/components/allocation-bars";
+import { useLocale } from "@/lib/i18n/context";
 
 function symbolFor(contractId: string): AssetSymbol | undefined {
   return (Object.keys(ASSETS) as AssetSymbol[]).find(
@@ -12,6 +13,7 @@ function symbolFor(contractId: string): AssetSymbol | undefined {
 
 export function AllocationChart({ vaultAddress }: { vaultAddress?: string } = {}) {
   const { data: allocation, isPending, isError, error } = useAllocation(vaultAddress);
+  const { t } = useLocale();
 
   if (isPending) {
     return (
@@ -26,8 +28,9 @@ export function AllocationChart({ vaultAddress }: { vaultAddress?: string } = {}
   if (isError) {
     return (
       <p className="text-sm text-muted">
-        Couldn&apos;t read live allocation from the vault contract:{" "}
-        {error instanceof Error ? error.message : "unknown error"}
+        {t.allocationChart.loadError(
+          error instanceof Error ? error.message : t.common.unknownError,
+        )}
       </p>
     );
   }

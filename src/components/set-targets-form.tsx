@@ -5,6 +5,7 @@ import { useWallet } from "@/hooks/use-wallet";
 import { useAllocation, useSetTargets } from "@/hooks/use-vault";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
 import { pctToBps } from "@/lib/format";
+import { useLocale } from "@/lib/i18n/context";
 import type { TargetWeight } from "@/contracts/vault";
 
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
@@ -14,6 +15,7 @@ export function SetTargetsForm({ vaultAddress }: { vaultAddress?: string } = {})
   const { address } = useWallet();
   const { data: allocation } = useAllocation(vaultAddress);
   const setTargets = useSetTargets();
+  const { t } = useLocale();
 
   const [weights, setWeights] = useState<Record<AssetSymbol, string>>(EMPTY_WEIGHTS);
   const [threshold, setThreshold] = useState("");
@@ -70,10 +72,10 @@ export function SetTargetsForm({ vaultAddress }: { vaultAddress?: string } = {})
         weight_bps: bps as number,
       }));
       await setTargets.mutateAsync({ address, targets, thresholdBps, vaultAddress });
-      setFeedback("Targets updated.");
+      setFeedback(t.setTargetsForm.targetsUpdated);
       setTouched(false);
     } catch (err) {
-      setFeedback(err instanceof Error ? err.message : "Transaction failed.");
+      setFeedback(err instanceof Error ? err.message : t.common.transactionFailed);
     }
   }
 
@@ -97,27 +99,25 @@ export function SetTargetsForm({ vaultAddress }: { vaultAddress?: string } = {})
         </div>
       ))}
       <p className={`text-xs ${totalBps === 10_000 ? "text-muted" : "text-status-warning"}`}>
-        Total: {(totalBps / 100).toFixed(2)}% (must equal 100.00%)
+        {t.common.totalMustEqual100((totalBps / 100).toFixed(2))}
       </p>
 
       <div className="flex items-center gap-3 border-t border-border pt-3">
         <label className="w-14 shrink-0 text-sm font-medium" htmlFor="target-threshold">
-          Drift
+          {t.common.drift}
         </label>
         <input
           id="target-threshold"
           type="text"
           inputMode="decimal"
-          placeholder="e.g. 5"
+          placeholder={t.common.thresholdPlaceholder}
           value={threshold}
           onChange={(e) => setThreshold(e.target.value)}
           className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm tabular-nums"
         />
         <span className="w-4 shrink-0 text-sm text-muted">%</span>
       </div>
-      <p className="text-xs text-muted">
-        Rebalancing triggers once any asset drifts this far from its target.
-      </p>
+      <p className="text-xs text-muted">{t.setTargetsForm.driftHelp}</p>
 
       <button
         type="button"
@@ -125,11 +125,11 @@ export function SetTargetsForm({ vaultAddress }: { vaultAddress?: string } = {})
         onClick={() => void submit()}
         className="w-full rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:opacity-50"
       >
-        Set targets
+        {t.common.setTargets}
       </button>
 
       {!address && (
-        <p className="text-xs text-muted">Connect a wallet to change targets.</p>
+        <p className="text-xs text-muted">{t.setTargetsForm.connectToChangeTargets}</p>
       )}
       {feedback && <p className="text-xs text-muted">{feedback}</p>}
     </div>
