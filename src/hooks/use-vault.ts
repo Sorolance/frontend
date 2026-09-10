@@ -8,23 +8,25 @@ const VAULT_QUERY_KEY = ["vault"] as const;
 
 /** Live per-asset allocation vs. target, read directly from the deployed
  * testnet vault contract - no wallet connection required, this is a
- * read-only simulated call. */
-export function useAllocation() {
+ * read-only simulated call. `vaultAddress` defaults to the hardcoded
+ * demo/legacy vault; pass a sub-portfolio's own address to read that one
+ * instead. */
+export function useAllocation(vaultAddress?: string) {
   return useQuery<AllocationEntry[]>({
-    queryKey: [...VAULT_QUERY_KEY, "allocation"],
+    queryKey: [...VAULT_QUERY_KEY, vaultAddress ?? "default", "allocation"],
     queryFn: async () => {
-      const tx = await getVaultClient().compute_allocation();
+      const tx = await getVaultClient(undefined, vaultAddress).compute_allocation();
       return tx.result.unwrap();
     },
     refetchInterval: 30_000,
   });
 }
 
-export function useNeedsRebalance() {
+export function useNeedsRebalance(vaultAddress?: string) {
   return useQuery<boolean>({
-    queryKey: [...VAULT_QUERY_KEY, "needsRebalance"],
+    queryKey: [...VAULT_QUERY_KEY, vaultAddress ?? "default", "needsRebalance"],
     queryFn: async () => {
-      const tx = await getVaultClient().needs_rebalance();
+      const tx = await getVaultClient(undefined, vaultAddress).needs_rebalance();
       return tx.result.unwrap();
     },
     refetchInterval: 30_000,
@@ -38,12 +40,14 @@ export function useDeposit() {
       address,
       asset,
       amount,
+      vaultAddress,
     }: {
       address: string;
       asset: string;
       amount: bigint;
+      vaultAddress?: string;
     }) => {
-      const client = getVaultClient({ publicKey: address });
+      const client = getVaultClient({ publicKey: address }, vaultAddress);
       const tx = await client.deposit({ from: address, asset, amount });
       const sent = await tx.signAndSend();
       return sent.result.unwrap();
@@ -65,12 +69,14 @@ export function useSetTargets() {
       address,
       targets,
       thresholdBps,
+      vaultAddress,
     }: {
       address: string;
       targets: TargetWeight[];
       thresholdBps: number;
+      vaultAddress?: string;
     }) => {
-      const client = getVaultClient({ publicKey: address });
+      const client = getVaultClient({ publicKey: address }, vaultAddress);
       const tx = await client.set_targets({
         targets,
         threshold_bps: thresholdBps,
@@ -91,12 +97,14 @@ export function useWithdraw() {
       address,
       asset,
       amount,
+      vaultAddress,
     }: {
       address: string;
       asset: string;
       amount: bigint;
+      vaultAddress?: string;
     }) => {
-      const client = getVaultClient({ publicKey: address });
+      const client = getVaultClient({ publicKey: address }, vaultAddress);
       const tx = await client.withdraw({ to: address, asset, amount });
       const sent = await tx.signAndSend();
       return sent.result.unwrap();

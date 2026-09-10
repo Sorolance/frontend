@@ -10,8 +10,8 @@ function symbolFor(contractId: string): AssetSymbol | undefined {
   );
 }
 
-export function AllocationChart() {
-  const { data: allocation, isPending, isError, error } = useAllocation();
+export function AllocationChart({ vaultAddress }: { vaultAddress?: string } = {}) {
+  const { data: allocation, isPending, isError, error } = useAllocation(vaultAddress);
 
   if (isPending) {
     return (

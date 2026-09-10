@@ -34,3 +34,23 @@ export const ASSETS = {
 } as const;
 
 export type AssetSymbol = keyof typeof ASSETS;
+
+/** The `oracle_adapter` every sub-portfolio's vault is initialized
+ * against - one shared instance, same as the default vault uses. */
+export const ORACLE_ADAPTER_CONTRACT_ID =
+  "CA3RFMJ4BQ3G7OH5MJKZE56VCHY7NFQASAJN2CYNEZBM4NL76SNBBY5E";
+
+/** The shared backend keeper's address (mirrors `backend/.env.example`'s
+ * `KEEPER_ADDRESS`) - authorized via `set_keeper` on every newly deployed
+ * sub-portfolio vault so `rebalancer-scheduler` can drive it. Public by
+ * design: a keeper key can only ever call `rebalance`, never withdraw or
+ * reconfigure (see PROJECT.md's execution-model decision). */
+export const KEEPER_ADDRESS =
+  "GCDIR3ZXHY7VNUL35BWZMBWDSHGC6LW3E4PRHH6ONBJI3UJIX4QVSK6Q";
+
+/** SHA-256 hash of the `vault` contract's Wasm, already installed on
+ * testnet by the very first vault deploy (`stellar contract info hash
+ * --id <VAULT_CONTRACT_ID> --network testnet`). Reused to deploy each new
+ * sub-portfolio's own vault instance without re-uploading the same Wasm. */
+export const VAULT_WASM_HASH =
+  "f43273a83ef0aabdb9916ecc3b6f0169a73d3ba787d5c73b7dc7f1760f7f239c";

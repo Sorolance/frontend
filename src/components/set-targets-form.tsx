@@ -10,9 +10,9 @@ import type { TargetWeight } from "@/contracts/vault";
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
 const EMPTY_WEIGHTS: Record<AssetSymbol, string> = { XLM: "", USDC: "" };
 
-export function SetTargetsForm() {
+export function SetTargetsForm({ vaultAddress }: { vaultAddress?: string } = {}) {
   const { address } = useWallet();
-  const { data: allocation } = useAllocation();
+  const { data: allocation } = useAllocation(vaultAddress);
   const setTargets = useSetTargets();
 
   const [weights, setWeights] = useState<Record<AssetSymbol, string>>(EMPTY_WEIGHTS);
@@ -69,7 +69,7 @@ export function SetTargetsForm() {
         price_asset: ASSETS[symbol].priceAsset,
         weight_bps: bps as number,
       }));
-      await setTargets.mutateAsync({ address, targets, thresholdBps });
+      await setTargets.mutateAsync({ address, targets, thresholdBps, vaultAddress });
       setFeedback("Targets updated.");
       setTouched(false);
     } catch (err) {

@@ -17,7 +17,12 @@ export default function DashboardPage() {
         <ConnectWalletButton />
       </header>
 
-      <h1 className="text-2xl font-semibold">Portfolio</h1>
+      <div className="mb-2 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Portfolio</h1>
+        <Link href="/app/portfolios" className="text-sm font-medium text-muted">
+          Sub-portfolios →
+        </Link>
+      </div>
       <p className="mt-1 text-sm text-muted">
         Live from the vault deployed on Stellar testnet.
       </p>

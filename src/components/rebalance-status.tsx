@@ -2,8 +2,8 @@
 
 import { useNeedsRebalance } from "@/hooks/use-vault";
 
-export function RebalanceStatus() {
-  const { data: needsRebalance, isPending, isError } = useNeedsRebalance();
+export function RebalanceStatus({ vaultAddress }: { vaultAddress?: string } = {}) {
+  const { data: needsRebalance, isPending, isError } = useNeedsRebalance(vaultAddress);
 
   if (isPending) {
     return <div className="h-6 w-40 animate-pulse rounded-full bg-border/60" />;

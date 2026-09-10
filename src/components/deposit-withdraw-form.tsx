@@ -6,7 +6,7 @@ import { useDeposit, useWithdraw } from "@/hooks/use-vault";
 import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
 import { toStroops } from "@/lib/format";
 
-export function DepositWithdrawForm() {
+export function DepositWithdrawForm({ vaultAddress }: { vaultAddress?: string } = {}) {
   const { address } = useWallet();
   const deposit = useDeposit();
   const withdraw = useWithdraw();
@@ -28,12 +28,14 @@ export function DepositWithdrawForm() {
           address,
           asset: ASSETS[asset].contractId,
           amount: stroops,
+          vaultAddress,
         });
       } else {
         await withdraw.mutateAsync({
           address,
           asset: ASSETS[asset].contractId,
           amount: stroops,
+          vaultAddress,
         });
       }
       setFeedback(`${action === "deposit" ? "Deposited" : "Withdrew"} ${amount} ${asset}.`);

@@ -12,9 +12,13 @@ import { RPC_URL } from "./config";
  * signature Freighter uses), so it can be passed straight through - no
  * adapter needed.
  */
-export function getVaultClient(wallet?: { publicKey?: string }) {
+/** `contractId` defaults to the single hardcoded demo/legacy vault -
+ * pass a sub-portfolio's own vault address to point this client at it
+ * instead (see `@/hooks/use-portfolios`). */
+export function getVaultClient(wallet?: { publicKey?: string }, contractId?: string) {
   return new VaultClient({
     ...vaultNetworks.testnet,
+    contractId: contractId ?? vaultNetworks.testnet.contractId,
     rpcUrl: RPC_URL,
     publicKey: wallet?.publicKey,
     signTransaction: StellarWalletsKit.signTransaction,
