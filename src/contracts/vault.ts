@@ -34,7 +34,7 @@ if (typeof window !== "undefined") {
 export const networks = {
   testnet: {
     networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "CC2PJBGDJOM4HNGDX5NJY4BNKQ2324PQSLWFDWXQDCFJ7AK6AIRLJ5AC",
+    contractId: "CBSJWOMX4RFL3JGUT6ICRR2UNCM4Z3JJPD7NUFQOHWVQWB3BTXJDVO5J",
   }
 } as const
 
@@ -96,28 +96,6 @@ export interface TradeInstruction {
   min_amount_out: i128;
 }
 
-/**
- * Matches the Reflector / SEP-40 oracle asset representation.
- */
-export type Asset = {tag: "Stellar", values: readonly [string]} | {tag: "Other", values: readonly [string]};
-
-
-/**
- * Matches the Reflector / SEP-40 oracle price response.
- */
-export interface PriceData {
-  price: i128;
-  timestamp: u64;
-}
-
-export const OracleError = {
-  1: {message:"NotInitialized"},
-  2: {message:"AlreadyInitialized"},
-  3: {message:"PriceUnavailable"},
-  4: {message:"PriceStale"},
-  5: {message:"InvalidPrice"}
-}
-
 export const RiskError = {
   1: {message:"NotInitialized"},
   2: {message:"AlreadyInitialized"},
@@ -144,6 +122,28 @@ export interface PriceObservation {
  */
 asset: string;
   price: i128;
+}
+
+/**
+ * Matches the Reflector / SEP-40 oracle asset representation.
+ */
+export type Asset = {tag: "Stellar", values: readonly [string]} | {tag: "Other", values: readonly [string]};
+
+
+/**
+ * Matches the Reflector / SEP-40 oracle price response.
+ */
+export interface PriceData {
+  price: i128;
+  timestamp: u64;
+}
+
+export const OracleError = {
+  1: {message:"NotInitialized"},
+  2: {message:"AlreadyInitialized"},
+  3: {message:"PriceUnavailable"},
+  4: {message:"PriceStale"},
+  5: {message:"InvalidPrice"}
 }
 
 export interface Client {
@@ -304,11 +304,11 @@ export class Client extends ContractClient {
         "AAAAAAAAAIFUcnVlIGlmIGFueSBhc3NldCdzIGxpdmUgZHJpZnQgbWVldHMgb3IgZXhjZWVkcyB0aGUgY29uZmlndXJlZAp0aHJlc2hvbGQuIEFuIGVtcHR5IHZhdWx0ICh0b3RhbCB2YWx1ZSAwKSBuZXZlciBuZWVkcyByZWJhbGFuY2luZy4AAAAAAAAPbmVlZHNfcmViYWxhbmNlAAAAAAAAAAABAAAD6QAAAAEAAAAD",
         "AAAAAAAAAAAAAAARcmVtb3ZlX3Jpc2tfZ3VhcmQAAAAAAAAAAAAAAQAAA+kAAAACAAAAAw==",
         "AAAAAAAAAH5DdXJyZW50IHBlci1hc3NldCBhbGxvY2F0aW9uIHZzLiB0YXJnZXQsIGNvbXB1dGVkIGxpdmUgZnJvbSBvcmFjbGUKcHJpY2VzIGFuZCBvbi1jaGFpbiBiYWxhbmNlcy4gUmVhZC1vbmx5IC0gbm8gYXV0aCByZXF1aXJlZC4AAAAAABJjb21wdXRlX2FsbG9jYXRpb24AAAAAAAAAAAABAAAD6QAAA+oAAAfQAAAAD0FsbG9jYXRpb25FbnRyeQAAAAAD",
+        "AAAABAAAAAAAAAAAAAAACVJpc2tFcnJvcgAAAAAAAAYAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAABAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAIAAAAAAAAADFVuYXV0aG9yaXplZAAAAAMAAAAAAAAADUludmFsaWRDb25maWcAAAAAAAAEAAAAAAAAABVDaXJjdWl0QnJlYWtlclRyaXBwZWQAAAAAAAAFAAAAAAAAABpDb25jZW50cmF0aW9uTGltaXRFeGNlZWRlZAAAAAAABg==",
+        "AAAAAQAAAT9PbmUgYXNzZXQncyBjdXJyZW50bHktb2JzZXJ2ZWQgcHJpY2UsIGFzIHRoZSB2YXVsdCBzZWVzIGl0IChzYW1lCnZhbHVlIGl0IGp1c3QgZ290IGZyb20gaXRzIG93biBvcmFjbGVfYWRhcHRlcikuIGByaXNrX2d1YXJkYCBuZXZlcgp0YWxrcyB0byBhbiBvcmFjbGUgZGlyZWN0bHkgLSBpdCBvbmx5IGV2ZXIgc2VlcyB3aGF0IHRoZSB2YXVsdCBoYW5kcwppdCwgc28gdGhlcmUncyBubyB0aGlyZCBjcm9zcy1jb250cmFjdCBob3AgYW5kIG5vIHJpc2sgb2YgdGhlIHR3bwpkaXNhZ3JlZWluZyBhYm91dCB3aGljaCBwcmljZSBmZWVkIGlzIGF1dGhvcml0YXRpdmUuAAAAAAAAAAAQUHJpY2VPYnNlcnZhdGlvbgAAAAIAAADXVGhlIGN1c3RvZGllZCB0b2tlbiBhZGRyZXNzIChtYXRjaGVzIGBUYXJnZXRXZWlnaHQuYXNzZXRgIGluCmB2YXVsdGApLCBub3QgdGhlIG9yYWNsZSdzIHByaWNpbmcga2V5IC0gdGhpcyBpcyBqdXN0IGFuIG9wYXF1ZQppZGVudGlmaWVyIHRvIGByaXNrX2d1YXJkYCwgdXNlZCBvbmx5IHRvIGtleSBpdHMgb3duCmxhc3Qtb2JzZXJ2ZWQtcHJpY2UgbWVtb3J5IHBlciBhc3NldC4AAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAFcHJpY2UAAAAAAAAL",
         "AAAAAgAAADtNYXRjaGVzIHRoZSBSZWZsZWN0b3IgLyBTRVAtNDAgb3JhY2xlIGFzc2V0IHJlcHJlc2VudGF0aW9uLgAAAAAAAAAABUFzc2V0AAAAAAAAAgAAAAEAAAAAAAAAB1N0ZWxsYXIAAAAAAQAAABMAAAABAAAAAAAAAAVPdGhlcgAAAAAAAAEAAAAR",
         "AAAAAQAAADVNYXRjaGVzIHRoZSBSZWZsZWN0b3IgLyBTRVAtNDAgb3JhY2xlIHByaWNlIHJlc3BvbnNlLgAAAAAAAAAAAAAJUHJpY2VEYXRhAAAAAAAAAgAAAAAAAAAFcHJpY2UAAAAAAAALAAAAAAAAAAl0aW1lc3RhbXAAAAAAAAAG",
-        "AAAABAAAAAAAAAAAAAAAC09yYWNsZUVycm9yAAAAAAUAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAABAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAIAAAAAAAAAEFByaWNlVW5hdmFpbGFibGUAAAADAAAAAAAAAApQcmljZVN0YWxlAAAAAAAEAAAAAAAAAAxJbnZhbGlkUHJpY2UAAAAF",
-        "AAAABAAAAAAAAAAAAAAACVJpc2tFcnJvcgAAAAAAAAYAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAABAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAIAAAAAAAAADFVuYXV0aG9yaXplZAAAAAMAAAAAAAAADUludmFsaWRDb25maWcAAAAAAAAEAAAAAAAAABVDaXJjdWl0QnJlYWtlclRyaXBwZWQAAAAAAAAFAAAAAAAAABpDb25jZW50cmF0aW9uTGltaXRFeGNlZWRlZAAAAAAABg==",
-        "AAAAAQAAAT9PbmUgYXNzZXQncyBjdXJyZW50bHktb2JzZXJ2ZWQgcHJpY2UsIGFzIHRoZSB2YXVsdCBzZWVzIGl0IChzYW1lCnZhbHVlIGl0IGp1c3QgZ290IGZyb20gaXRzIG93biBvcmFjbGVfYWRhcHRlcikuIGByaXNrX2d1YXJkYCBuZXZlcgp0YWxrcyB0byBhbiBvcmFjbGUgZGlyZWN0bHkgLSBpdCBvbmx5IGV2ZXIgc2VlcyB3aGF0IHRoZSB2YXVsdCBoYW5kcwppdCwgc28gdGhlcmUncyBubyB0aGlyZCBjcm9zcy1jb250cmFjdCBob3AgYW5kIG5vIHJpc2sgb2YgdGhlIHR3bwpkaXNhZ3JlZWluZyBhYm91dCB3aGljaCBwcmljZSBmZWVkIGlzIGF1dGhvcml0YXRpdmUuAAAAAAAAAAAQUHJpY2VPYnNlcnZhdGlvbgAAAAIAAADXVGhlIGN1c3RvZGllZCB0b2tlbiBhZGRyZXNzIChtYXRjaGVzIGBUYXJnZXRXZWlnaHQuYXNzZXRgIGluCmB2YXVsdGApLCBub3QgdGhlIG9yYWNsZSdzIHByaWNpbmcga2V5IC0gdGhpcyBpcyBqdXN0IGFuIG9wYXF1ZQppZGVudGlmaWVyIHRvIGByaXNrX2d1YXJkYCwgdXNlZCBvbmx5IHRvIGtleSBpdHMgb3duCmxhc3Qtb2JzZXJ2ZWQtcHJpY2UgbWVtb3J5IHBlciBhc3NldC4AAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAFcHJpY2UAAAAAAAAL" ]),
+        "AAAABAAAAAAAAAAAAAAAC09yYWNsZUVycm9yAAAAAAUAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAABAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAIAAAAAAAAAEFByaWNlVW5hdmFpbGFibGUAAAADAAAAAAAAAApQcmljZVN0YWxlAAAAAAAEAAAAAAAAAAxJbnZhbGlkUHJpY2UAAAAF" ]),
       options
     )
   }
