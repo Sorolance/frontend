@@ -35,6 +35,7 @@ export const en = {
     openDashboard: "Open dashboard",
     openLiveDashboard: "Open live dashboard",
     tryDemo: "Try demo",
+    browseStrategies: "Strategy templates →",
   },
   home: {
     kicker: "Stellar · Soroban",
@@ -103,6 +104,50 @@ export const en = {
     vaultAddress: (short: string) => `Vault ${short}`,
     loadError: (message: string) => `Couldn't load this portfolio: ${message}`,
     downloadAuditLog: "Download audit log (CSV)",
+  },
+  whatIfSimulator: {
+    title: "What-if stress simulator",
+    help: "Shock any asset's price (in %) and run the simulation to see the projected drift and trades - nothing here executes on-chain.",
+    shockPlaceholder: "e.g. -30",
+    run: "Run simulation",
+    running: "Simulating…",
+    wouldRebalance: "Would trigger a rebalance",
+    onTarget: "Would stay on target",
+    projectedTrades: "Projected trades",
+    noTrades: "No trades needed.",
+    tradeLine: (amount: string, assetIn: string, assetOut: string) =>
+      `Sell ${amount} ${assetIn} for ${assetOut}`,
+    simulateFailed: (message: string) => `Simulation failed: ${message}`,
+  },
+  publishStrategyForm: {
+    title: "Publish as a strategy template",
+    help: "Snapshots this portfolio's current targets and threshold into a public, anonymized template - no owner or vault address is ever included.",
+    namePlaceholder: "Optional public name (defaults to this portfolio's name)",
+    publish: "Publish as template",
+    publishing: "Publishing…",
+    published: "Published — visible on the Strategy templates page.",
+    publishFailed: "Failed to publish.",
+  },
+  webhookForm: {
+    title: "External trigger webhook",
+    help: "Register a webhook URL your own system can POST a signed trigger to, so this portfolio gets checked immediately instead of waiting for the next scheduled poll.",
+    urlPlaceholder: "https://example.com/webhook",
+    eventTypes: "Also notify on",
+    eventRebalanceCompleted: "Rebalance completed",
+    eventCircuitBreakerTripped: "Circuit breaker tripped",
+    register: "Register webhook",
+    registering: "Registering…",
+    registered: "Webhook registered — copy the secret now, it won't be shown again.",
+    secretLabel: "Secret",
+    registerFailed: "Failed to register webhook.",
+  },
+  strategyTemplates: {
+    title: "Strategy templates",
+    subtitle:
+      "Browse target-allocation templates published anonymously by other portfolios. Clone one to prefill a new portfolio - nothing here is linked back to whoever published it.",
+    loadError: (message: string) => `Couldn't load strategy templates: ${message}`,
+    empty: "No strategy templates published yet.",
+    clone: "Clone",
   },
 };
 

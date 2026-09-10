@@ -35,6 +35,15 @@ export const ASSETS = {
 
 export type AssetSymbol = keyof typeof ASSETS;
 
+/** Reverse lookup from a target's on-chain (SAC) contract id back to its
+ * configured symbol, for display - shared by every place that renders a
+ * raw asset address (live allocation, simulator projections, trades). */
+export function symbolFor(contractId: string): AssetSymbol | undefined {
+  return (Object.keys(ASSETS) as AssetSymbol[]).find(
+    (symbol) => ASSETS[symbol].contractId === contractId,
+  );
+}
+
 /** The `oracle_adapter` every sub-portfolio's vault is initialized
  * against - one shared instance, same as the default vault uses. */
 export const ORACLE_ADAPTER_CONTRACT_ID =

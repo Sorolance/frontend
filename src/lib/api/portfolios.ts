@@ -25,7 +25,10 @@ export type ApiPortfolio = {
  * than a generic "response not ok". */
 export class ApiError extends Error {}
 
-async function handle<T>(response: Response): Promise<T> {
+/** Shared response handling for every `rebalancer-api` caller in this
+ * directory - surfaces the API's own `{"error": "..."}` body (see
+ * `ApiError` above) instead of a generic "response not ok". */
+export async function handle<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     const message =

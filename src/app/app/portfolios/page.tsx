@@ -1,13 +1,41 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
-import { CreatePortfolioForm } from "@/components/create-portfolio-form";
+import { CreatePortfolioForm, type CreatePortfolioInitial } from "@/components/create-portfolio-form";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useWallet } from "@/hooks/use-wallet";
 import { usePortfolios } from "@/hooks/use-portfolios";
+import { useStrategyTemplate } from "@/hooks/use-strategies";
 import { formatBps } from "@/lib/format";
+import { symbolFor, type AssetSymbol } from "@/lib/stellar/config";
 import { useLocale } from "@/lib/i18n/context";
+
+/** Reads `?template=<id>` (if present) and prefills `CreatePortfolioForm`
+ * from it - split out from the page so only this part needs the
+ * `useSearchParams` Suspense boundary Next.js requires for a statically
+ * prerendered page (see the "Create a portfolio" section below). */
+function CreatePortfolioSection() {
+  const searchParams = useSearchParams();
+  const templateId = searchParams.get("template") ?? undefined;
+  const { data: template } = useStrategyTemplate(templateId);
+
+  let initial: CreatePortfolioInitial | undefined;
+  if (template) {
+    const weights: Partial<Record<AssetSymbol, string>> = {};
+    for (const target of template.targets) {
+      const symbol = symbolFor(target.asset);
+      if (symbol) weights[symbol] = (target.weight_bps / 100).toString();
+    }
+    initial = { name: template.name, thresholdBps: template.threshold_bps, weights };
+  }
+
+  return (
+    <CreatePortfolioForm key={template ? `template-${template.id}` : "blank"} initial={initial} />
+  );
+}
 
 export default function PortfoliosPage() {
   const { address } = useWallet();
@@ -66,8 +94,15 @@ export default function PortfoliosPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="mb-3 text-sm font-medium text-muted">{t.portfolios.createSection}</h2>
-        <CreatePortfolioForm />
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-medium text-muted">{t.portfolios.createSection}</h2>
+          <Link href="/app/strategies" className="text-sm font-medium text-muted">
+            {t.nav.browseStrategies}
+          </Link>
+        </div>
+        <Suspense fallback={null}>
+          <CreatePortfolioSection />
+        </Suspense>
       </section>
     </div>
   );

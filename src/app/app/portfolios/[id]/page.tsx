@@ -8,6 +8,9 @@ import { RebalanceStatus } from "@/components/rebalance-status";
 import { DepositWithdrawForm } from "@/components/deposit-withdraw-form";
 import { SetTargetsForm } from "@/components/set-targets-form";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { WhatIfSimulator } from "@/components/what-if-simulator";
+import { PublishStrategyForm } from "@/components/publish-strategy-form";
+import { WebhookForm } from "@/components/webhook-form";
 import { usePortfolio } from "@/hooks/use-portfolios";
 import { reportCsvUrl } from "@/lib/api/portfolios";
 import { useLocale } from "@/lib/i18n/context";
@@ -75,6 +78,25 @@ export default function PortfolioDetailPage({
             >
               {t.portfolioDetail.downloadAuditLog}
             </a>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="mb-3 text-sm font-medium text-muted">{t.whatIfSimulator.title}</h2>
+            <WhatIfSimulator
+              portfolioId={portfolio.id}
+              vaultAddress={portfolio.vault_address}
+              targets={portfolio.targets}
+            />
+          </section>
+
+          <section className="mt-6">
+            <h2 className="mb-3 text-sm font-medium text-muted">{t.publishStrategyForm.title}</h2>
+            <PublishStrategyForm portfolioId={portfolio.id} />
+          </section>
+
+          <section className="mt-6">
+            <h2 className="mb-3 text-sm font-medium text-muted">{t.webhookForm.title}</h2>
+            <WebhookForm portfolioId={portfolio.id} />
           </section>
         </>
       )}

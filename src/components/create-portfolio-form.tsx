@@ -10,14 +10,35 @@ import { useLocale } from "@/lib/i18n/context";
 const SYMBOLS = Object.keys(ASSETS) as AssetSymbol[];
 const EMPTY_WEIGHTS: Record<AssetSymbol, string> = { XLM: "", USDC: "" };
 
-export function CreatePortfolioForm({ onCreated }: { onCreated?: (id: string) => void }) {
+/** Prefills the form from a cloned strategy template (see
+ * `/app/portfolios/page.tsx`) - the caller should remount the form with a
+ * fresh `key` when this changes, rather than relying on an effect, so the
+ * prefill only ever applies once, on mount. */
+export type CreatePortfolioInitial = {
+  name: string;
+  thresholdBps: number;
+  weights: Partial<Record<AssetSymbol, string>>;
+};
+
+export function CreatePortfolioForm({
+  onCreated,
+  initial,
+}: {
+  onCreated?: (id: string) => void;
+  initial?: CreatePortfolioInitial;
+}) {
   const { address } = useWallet();
   const createPortfolio = useCreatePortfolio();
   const { t } = useLocale();
 
-  const [name, setName] = useState("");
-  const [weights, setWeights] = useState<Record<AssetSymbol, string>>(EMPTY_WEIGHTS);
-  const [threshold, setThreshold] = useState("5");
+  const [name, setName] = useState(initial?.name ?? "");
+  const [weights, setWeights] = useState<Record<AssetSymbol, string>>({
+    ...EMPTY_WEIGHTS,
+    ...initial?.weights,
+  });
+  const [threshold, setThreshold] = useState(
+    initial ? (initial.thresholdBps / 100).toString() : "5",
+  );
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const parsedWeights = SYMBOLS.map((symbol) => ({

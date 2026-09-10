@@ -1,15 +1,9 @@
 "use client";
 
 import { useAllocation } from "@/hooks/use-vault";
-import { ASSETS, type AssetSymbol } from "@/lib/stellar/config";
+import { symbolFor } from "@/lib/stellar/config";
 import { AllocationBars } from "@/components/allocation-bars";
 import { useLocale } from "@/lib/i18n/context";
-
-function symbolFor(contractId: string): AssetSymbol | undefined {
-  return (Object.keys(ASSETS) as AssetSymbol[]).find(
-    (symbol) => ASSETS[symbol].contractId === contractId,
-  );
-}
 
 export function AllocationChart({ vaultAddress }: { vaultAddress?: string } = {}) {
   const { data: allocation, isPending, isError, error } = useAllocation(vaultAddress);
