@@ -48,11 +48,21 @@ onto `<html>` on init - fixed with `suppressHydrationWarning` on that
 element, the standard escape hatch for a third-party script mutating it
 before hydration).
 
-`vault` was later redeployed (Phase 2, to attach `risk_guard` - see
-`../contracts/README.md`) and `src/contracts/vault.ts` regenerated
-against the new address accordingly. `tsc --noEmit` and `eslint` both
-pass clean against the regenerated bindings, but the browser
-verification above predates that redeploy and hasn't been repeated
-against it - environment constraints in the session that did the
-redeploy meant `next dev` wasn't reachable to re-screenshot. Worth an
-actual browser pass before calling this re-verified.
+`vault` was later redeployed twice more (Phase 2, to attach
+`risk_guard`; Phase 4, to attach `router` - see
+`../contracts/README.md`), and `src/contracts/vault.ts` regenerated
+against the new address each time. `tsc --noEmit` and `eslint` both
+pass clean against the current bindings; `next dev` now starts cleanly
+too (`/` and `/app` both real 200s, no server errors) and the shipped
+JS bundle was confirmed to contain the current vault address - what
+looked like an environment constraint blocking `next dev` in an earlier
+session was actually just `node`/`npm` not being on `PATH` in a
+non-interactive shell (this project's `node_modules` needs the Linux
+`node` installed via `nvm` at `~/.nvm` - source `~/.nvm/nvm.sh` and
+`nvm use` before running any `npm`/`npx` command here; the plain
+`npm`/`npx` on `PATH` otherwise resolves to a Windows `node.exe` via
+WSL interop and fails on this project's Linux-built `node_modules`).
+Still not re-verified: an actual browser pass with a connected wallet
+(no headless-browser/screenshot tool was available in the session that
+did this latest redeploy) - worth doing before calling this
+re-verified.
